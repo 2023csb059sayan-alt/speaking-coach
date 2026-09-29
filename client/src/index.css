@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply min-h-dvh bg-surface-900 text-slate-100 antialiased;
+    /* Nothing here should be selectable by accident while a learner is tapping fast. */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* A visible focus ring is required for keyboard users, and phones benefit too. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent-400 ring-offset-2 ring-offset-surface-900;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/10 bg-surface-800/70 shadow-card backdrop-blur;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-white/15 bg-surface-900/60 px-4 py-3 text-base
+      text-slate-100 placeholder:text-slate-400 focus:border-accent-500 focus:outline-none
+      focus:ring-2 focus:ring-accent-500/40;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-300;
+  }
+
+  .btn {
+    /* 44px minimum target height for thumbs. */
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-3
+      text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent-500 text-slate-950 hover:bg-accent-400;
+  }
+
+  .btn-ghost {
+    @apply btn border border-white/15 text-slate-200 hover:border-white/30 hover:bg-white/5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

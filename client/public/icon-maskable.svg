@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Speaking Coach">
+  <defs>
+    <linearGradient id="bgm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#18244a" />
+      <stop offset="1" stop-color="#0b1020" />
+    </linearGradient>
+  </defs>
+  <!-- Full bleed: maskable icons are cropped, so all content sits inside the middle 80%. -->
+  <rect width="512" height="512" fill="url(#bgm)" />
+  <g fill="none" stroke="#2dd4bf" stroke-linecap="round" stroke-width="20">
+    <path d="M256 158v74" />
+    <path d="M206 210v38a50 50 0 0 0 100 0v-38" />
+    <path d="M182 254v14a74 74 0 0 0 148 0v-14" />
+  </g>
+  <path d="M212 344h88l-44 44z" fill="#5eead4" />
+</svg>

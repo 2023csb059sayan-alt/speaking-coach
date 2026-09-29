@@ -1,0 +1,45 @@
+{
+  "name": "speaking-coach",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Free-forever AI English speaking coach PWA with an interview preparation module.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build -w @speaking-coach/shared && npm run build -w @speaking-coach/server && npm run build -w @speaking-coach/client",
+    "build:shared": "npm run build -w @speaking-coach/shared",
+    "build:server": "npm run build -w @speaking-coach/server",
+    "build:client": "npm run build -w @speaking-coach/client",
+    "dev": "concurrently -n server,client -c cyan,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run dev -w @speaking-coach/server",
+    "dev:client": "npm run dev -w @speaking-coach/client",
+    "start": "npm run start -w @speaking-coach/server",
+    "typecheck": "npm run build -w @speaking-coach/shared && npm run typecheck -w @speaking-coach/server && npm run typecheck -w @speaking-coach/client",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,css,html}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,css,html}\"",
+    "test": "npm run build -w @speaking-coach/shared && npm run test -w @speaking-coach/server",
+    "health:cli": "npm run health -w @speaking-coach/server"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "concurrently": "9.2.4",
+    "eslint": "9.39.5",
+    "globals": "16.5.0",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0"
+  },
+  "allowScripts": {
+    "argon2@0.45.1": true,
+    "esbuild@0.23.1": true,
+    "esbuild@0.28.2": true
+  }
+}
