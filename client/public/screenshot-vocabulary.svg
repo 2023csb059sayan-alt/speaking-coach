@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020" />
+      <stop offset="1" stop-color="#18244a" />
+    </linearGradient>
+  </defs>
+  <rect width="720" height="1280" fill="url(#bg)" />
+  <!-- Header -->
+  <rect x="24" y="24" width="672" height="80" rx="12" fill="#111a33" stroke="#2dd4bf" stroke-width="2" stroke-opacity="0.3" />
+  <text x="56" y="72" font-family="system-ui, sans-serif" font-size="28" font-weight="600" fill="#e2e8f0">Speaking Coach</text>
+  <text x="56" y="96" font-family="system-ui, sans-serif" font-size="16" fill="#94a3b8">Vocabulary Review — SM-2</text>
+  <!-- Stats bar -->
+  <rect x="24" y="128" width="672" height="80" rx="16" fill="#111a33" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.3" />
+  <g font-family="system-ui, sans-serif">
+    <text x="80" y="170" font-size="14" fill="#94a3b8">DUE TODAY</text>
+    <text x="80" y="196" font-size="32" font-weight="700" fill="#f97316">12</text>
+    <text x="280" y="170" font-size="14" fill="#94a3b8">REVIEWED TODAY</text>
+    <text x="280" y="196" font-size="32" font-weight="700" fill="#22c55e">8</text>
+    <text x="480" y="170" font-size="14" fill="#94a3b8">RETENTION</text>
+    <text x="480" y="196" font-size="32" font-weight="700" fill="#2dd4bf">87%</text>
+    <text x="600" y="170" font-size="14" fill="#94a3b8">STREAK</text>
+    <text x="600" y="196" font-size="32" font-weight="700" fill="#fbbf24">14</text>
+  </g>
+  <!-- Card 1 - Due now -->
+  <rect x="24" y="240" width="672" height="140" rx="16" fill="#1e2a4a" stroke="#f97316" stroke-width="2" />
+  <g font-family="system-ui, sans-serif">
+    <text x="56" y="278" font-size="12" font-weight="600" fill="#f97316">DUE NOW</text>
+    <text x="56" y="310" font-size="28" font-weight="700" fill="#e2e8f0">mitigate</text>
+    <text x="56" y="345" font-size="16" fill="#94a3b8">/ˈmɪt.ɪ.ɡeɪt/ — to make less severe</text>
+    <text x="56" y="370" font-size="14" fill="#94a3b8">"The new policy will mitigate the risk of data breaches."</text>
+  </g>
+  <!-- Grade buttons -->
+  <g font-family="system-ui, sans-serif" font-size="14" font-weight="600">
+    <rect x="56" y="390" width="80" height="40" rx="8" fill="#ef4444" />
+    <text x="96" y="416" text-anchor="middle" fill="white">Again (0)</text>
+    <rect x="150" y="390" width="80" height="40" rx="8" fill="#f97316" />
+    <text x="190" y="416" text-anchor="middle" fill="white">Hard (1)</text>
+    <rect x="244" y="390" width="80" height="40" rx="8" fill="#eab308" />
+    <text x="284" y="416" text-anchor="middle" fill="white">Good (2)</text>
+    <rect x="338" y="390" width="80" height="40" rx="8" fill="#22c55e" />
+    <text x="378" y="416" text-anchor="middle" fill="white">Easy (3)</text>
+    <rect x="432" y="390" width="80" height="40" rx="8" fill="#2dd4bf" />
+    <text x="472" y="416" text-anchor="middle" fill="#0b1020">Perfect (4)</text>
+    <rect x="526" y="390" width="80" height="40" rx="8" fill="#8b5cf6" />
+    <text x="566" y="416" text-anchor="middle" fill="white">Master (5)</text>
+  </g>
+  <!-- Card 2 -->
+  <rect x="24" y="460" width="672" height="140" rx="16" fill="#1e2a4a" stroke="#22c55e" stroke-width="2" />
+  <g font-family="system-ui, sans-serif">
+    <text x="56" y="498" font-size="12" font-weight="600" fill="#22c55e">REVIEW AGAIN IN 6 DAYS</text>
+    <text x="56" y="530" font-size="28" font-weight="700" fill="#e2e8f0">articulate</text>
+    <text x="56" y="565" font-size="16" fill="#94a3b8">/ɑːrˈtɪk.jə.leɪt/ — express clearly</text>
+    <text x="56" y="590" font-size="14" fill="#94a3b8">"She can articulate complex ideas simply."</text>
+  </g>
+  <!-- Card 3 -->
+  <rect x="24" y="680" width="672" height="140" rx="16" fill="#1e2a4a" stroke="#2dd4bf" stroke-width="2" />
+  <g font-family="system-ui, sans-serif">
+    <text x="56" y="718" font-size="12" font-weight="600" fill="#2dd4bf">REVIEW AGAIN IN 14 DAYS</text>
+    <text x="56" y="750" font-size="28" font-weight="700" fill="#e2e8f0">comprehensive</text>
+    <text x="56" y="785" font-size="16" fill="#94a3b8">/ˌkɒm.prɪˈhen.sɪv/ — complete, thorough</text>
+    <text x="56" y="810" font-size="14" fill="#94a3b8">"We need a comprehensive plan for the project."</text>
+  </g>
+  <!-- Card 4 -->
+  <rect x="24" y="900" width="672" height="140" rx="16" fill="#1e2a4a" stroke="#8b5cf6" stroke-width="2" />
+  <g font-family="system-ui, sans-serif">
+    <text x="56" y="938" font-size="12" font-weight="600" fill="#8b5cf6">REVIEW AGAIN IN 30 DAYS</text>
+    <text x="56" y="970" font-size="28" font-weight="700" fill="#e2e8f0">elaborate</text>
+    <text x="56" y="1005" font-size="16" fill="#94a3b8">/ɪˈlæb.ə.reɪt/ — explain in detail</text>
+    <text x="56" y="1030" font-size="14" fill="#94a3b8">"Could you elaborate on your proposed solution?"</text>
+  </g>
+  <!-- Bottom progress -->
+  <rect x="24" y="1100" width="672" height="60" rx="16" fill="#111a33" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.3" />
+  <text x="360" y="1135" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#e2e8f0">Session complete! 4 cards reviewed.</text>
+  <text x="360" y="1155" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#94a3b8">Next review scheduled for tomorrow.</text>
+</svg>

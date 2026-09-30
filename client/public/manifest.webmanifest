@@ -26,7 +26,55 @@
   "shortcuts": [
     {
       "name": "Practise now",
-      "url": "/"
+      "short_name": "Practise",
+      "description": "Start a conversation practice session",
+      "url": "/#conversation",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Interview Prep",
+      "short_name": "Interview",
+      "description": "Prepare for job interviews",
+      "url": "/#interview",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Vocabulary",
+      "short_name": "Vocab",
+      "description": "Review vocabulary with spaced repetition",
+      "url": "/#vocabulary",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-conversation.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Conversation practice screen"
+    },
+    {
+      "src": "/screenshot-interview.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Interview preparation screen"
+    },
+    {
+      "src": "/screenshot-vocabulary.svg",
+      "sizes": "720x1280",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "Vocabulary review screen"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+speakingcoach",
+      "url": "/%s"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

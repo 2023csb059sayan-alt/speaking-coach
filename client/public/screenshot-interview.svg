@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020" />
+      <stop offset="1" stop-color="#18244a" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)" />
+  <!-- Header -->
+  <rect x="40" y="40" width="1200" height="80" rx="12" fill="#111a33" stroke="#2dd4bf" stroke-width="2" stroke-opacity="0.3" />
+  <text x="80" y="90" font-family="system-ui, sans-serif" font-size="28" font-weight="600" fill="#e2e8f0">Speaking Coach</text>
+  <text x="80" y="112" font-family="system-ui, sans-serif" font-size="16" fill="#94a3b8">Interview Preparation — Behavioral (STAR)</text>
+  <!-- Progress indicator -->
+  <rect x="40" y="160" width="1200" height="60" rx="12" fill="#111a33" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.3" />
+  <text x="80" y="198" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="#e2e8f0">Question 2 of 5</text>
+  <rect x="900" y="170" width="300" height="40" rx="20" fill="#2dd4bf" fill-opacity="0.2" />
+  <text x="1050" y="192" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#2dd4bf">Readiness: 72%</text>
+  <!-- Question card -->
+  <rect x="40" y="250" width="1200" height="200" rx="16" fill="#1e2a4a" stroke="#2dd4bf" stroke-width="2" stroke-opacity="0.3" />
+  <text x="80" y="290" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#5eead4">QUESTION</text>
+  <text x="80" y="330" font-family="system-ui, sans-serif" font-size="22" font-weight="500" fill="#e2e8f0">"Tell me about a time you faced a difficult challenge at work. How did you handle it?"</text>
+  <text x="80" y="380" font-family="system-ui, sans-serif" font-size="14" fill="#94a3b8">Use the STAR method: Situation → Task → Action → Result</text>
+  <!-- Answer area -->
+  <rect x="40" y="480" width="1200" height="160" rx="16" fill="#111a33" stroke="#2dd4bf" stroke-width="2" stroke-opacity="0.2" />
+  <text x="80" y="520" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#5eead4">YOUR ANSWER</text>
+  <text x="80" y="560" font-family="system-ui, sans-serif" font-size="18" fill="#e2e8f0">"In my previous role as a project manager (Situation), our team faced a critical deadline with a key developer leaving (Task). I quickly reassigned tasks, negotiated scope with stakeholders, and personally handled critical modules (Action). We delivered on time with 95% test coverage (Result)."</text>
+  <!-- Controls -->
+  <rect x="500" y="680" width="280" height="60" rx="30" fill="#2dd4bf" />
+  <circle cx="640" cy="710" r="18" fill="#0b1020" />
+  <path d="M630 710 L638 718 L650 702" stroke="#2dd4bf" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="640" y="660" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Hold to answer</text>
+  <!-- Navigation -->
+  <rect x="80" y="680" width="180" height="50" rx="12" fill="#1e2a4a" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.3" />
+  <text x="170" y="712" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#e2e8f0">Previous</text>
+  <rect x="1020" y="680" width="180" height="50" rx="12" fill="#2dd4bf" />
+  <text x="1110" y="712" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#0b1020">Next</text>
+</svg>

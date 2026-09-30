@@ -51,6 +51,25 @@
   .btn-ghost {
     @apply btn border border-white/15 text-slate-200 hover:border-white/30 hover:bg-white/5;
   }
+
+  /* Screen reader only - for accessibility announcements */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: more) {
+    .card {
+      @apply border-2 border-white;
+    }
+    .field {
+      @apply border-2 border-white;
+    }
+    .btn-primary {
+      @apply border-2 border-white;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

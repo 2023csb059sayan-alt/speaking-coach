@@ -1,18 +1,30 @@
 /*
  * Service worker.
  *
- * Scope for Phase 1: make the app shell available offline and show something
- * honest when the network is gone. It deliberately does not touch /api, because a
- * cached auth response would be worse than an error message.
+ * Scope for Phase 6: make the app shell available offline, handle install prompts,
+ * and provide honest offline fallbacks for practice modes.
  *
  * Strategy:
  *   - navigations: network first, fall back to the cached shell, then to offline.html;
  *   - static assets: cache first, refreshed in the background;
- *   - /api: network only.
+ *   - /api: network only (never cached);
+ *   - install prompt handling for PWA installability.
  */
 
-const CACHE_NAME = 'speaking-coach-shell-v1';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg', '/offline.html'];
+const CACHE_NAME = 'speaking-coach-shell-v2';
+const SHELL = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/icon.svg',
+  '/icon-maskable.svg',
+  '/offline.html',
+  '/screenshot-conversation.svg',
+  '/screenshot-interview.svg',
+  '/screenshot-vocabulary.svg',
+];
+
+let deferredPrompt = null;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -31,6 +43,37 @@ self.addEventListener('activate', (event) => {
       .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
+});
+
+// Handle install prompt
+self.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredPrompt = event;
+  // Notify clients that install is available
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({ type: 'INSTALL_AVAILABLE' });
+    });
+  });
+});
+
+self.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  console.log('Speaking Coach installed as PWA');
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'PROMPT_INSTALL') {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+          console.log('User accepted install');
+        }
+        deferredPrompt = null;
+      });
+    }
+  }
 });
 
 self.addEventListener('fetch', (event) => {
