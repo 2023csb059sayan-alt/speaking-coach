@@ -19,3 +19,9 @@ Thumbs.db
 .idea/
 .cache/
 .mongodb-binaries/
+
+# Stray artifacts from local debugging. Never commit these.
+cookies.txt
+*.cookies
+.wrangler/
+.vercel/

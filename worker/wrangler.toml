@@ -1,0 +1,27 @@
+# ---------------------------------------------------------------------------
+# Cloudflare Worker cron: keep the API awake
+#
+# Render Hobby spins the service down after 15 minutes without traffic, and the
+# first learner of the day would then wait 30-50 seconds for a cold start. This
+# worker pings the liveness endpoint every 10 minutes so the service stays warm.
+#
+# It costs nothing: cron triggers on the Workers Free plan allow 1,000
+# invocations a day, and this uses 144.
+#
+# Deploy with:
+#   npx wrangler login
+#   npx wrangler deploy
+#
+# Set the target with:
+#   npx wrangler secret put API_BASE_URL
+# ---------------------------------------------------------------------------
+name = "speaking-coach-keepalive"
+main = "src/index.js"
+compatibility_date = "2026-09-30"
+
+# Every 10 minutes. Keep this above Render's 15 minute idle window.
+[triggers]
+crons = ["*/10 * * * *"]
+
+# The target URL is a secret, not a var, so it is never committed:
+#   npx wrangler secret put API_BASE_URL

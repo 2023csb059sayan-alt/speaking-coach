@@ -1,0 +1,122 @@
+# ---------------------------------------------------------------------------
+# Render Blueprint
+#
+# Render reads this file when you create a service with "New +" -> "Blueprint"
+# and points it at this repository. It creates the API service and pre-fills
+# every environment variable, so the dashboard setup is one click instead of
+# twenty manual entries.
+#
+# Secrets use `generateValue: true`, which means Render invents a random value
+# once, on first create, and never shows it again. Nothing secret lives in this
+# file.
+#
+# Read docs/deployment.md before running this.
+# ---------------------------------------------------------------------------
+
+services:
+  - type: web
+    name: speaking-coach-api
+    runtime: node
+    plan: free
+
+    # The monorepo root, not server/. The root build compiles shared, then the
+    # server, then the client, which is the order typecheck and tests expect.
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health/live
+
+    # Render Hobby spins down after 15 minutes idle. docs/deployment.md covers
+    # the Cloudflare Worker cron that keeps it warm.
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: LOG_PRETTY
+        value: 'false'
+
+      - key: LOG_LEVEL
+        value: info
+
+      # Required and must differ from each other. 32+ characters, so a
+      # generated value is always valid.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      # NOT generateValue: the server accepts only 64 hex chars or base64 that
+      # decodes to exactly 32 bytes (server/src/env.ts parseEncryptionKey), and
+      # Render's generator does not promise either format. Generating it wrongly
+      # would fail the boot with a validation error. Create it with:
+      #   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+      - key: BYOK_ENCRYPTION_KEY
+        sync: false
+
+      - key: BYOK_ENABLED
+        value: 'true'
+
+      # Cross-site cookies: the client runs on Cloudflare Pages, the API on
+      # Render, so SameSite=None (HTTPS only) is required for auth to work.
+      - key: COOKIE_SAMESITE
+        value: none
+
+      # Fill these two in after Cloudflare Pages gives you your URL.
+      # https://<project>.pages.dev
+      - key: API_BASE_URL
+        value: https://CHANGE-ME.onrender.com
+      - key: CORS_ORIGINS
+        value: https://CHANGE-ME.pages.dev
+
+      # MongoDB Atlas M0 connection string. Create the cluster first, then paste
+      # it here as a marked-as-secret value in the Render dashboard.
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: speaking_coach
+
+      # Optional providers. The service boots with none configured and reports
+      # honestly on /api/health/providers, but it cannot answer a single request
+      # without at least one. Add GROQ_API_KEY at minimum.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_AI_TOKEN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      # A placeholder sender is harmless until a Resend domain is verified; the
+      # service refuses to send mail from an unverified domain, which is the
+      # behaviour we want. Quoted because of the angle brackets.
+      - key: MAIL_FROM
+        value: 'Speaking Coach <noreply@CHANGE-ME.example>'
+
+      # Free-tier chains. Do not change unless you have read docs/free-tiers.md.
+      - key: CHAIN_STT
+        value: groq-stt,workersai-stt
+      - key: CHAIN_TTS
+        value: groq-tts
+      - key: CHAIN_LLM
+        value: groq-llm,workersai-llm
+
+      - key: FAIR_USE_DAILY_SPEAKING_MINUTES
+        value: '20'
+      - key: INTERVIEW_RESERVED_MINUTES
+        value: '10'
+
+      - key: RATE_LIMIT_AUTH_PER_15_MIN
+        value: '10'
+      - key: RATE_LIMIT_API_PER_MIN
+        value: '240'
+
+      # Audio is never stored unless a learner turns it on themselves, and Render
+      # Hobby's disk is ephemeral anyway. Leave this off.
+      - key: AUDIO_STORAGE_ENABLED
+        value: 'false'
+
+      - key: DEEP_PROBE
+        value: 'false'
+      - key: PROBE_INTERVAL_MINUTES
+        value: '15'

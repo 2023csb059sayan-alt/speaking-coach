@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { api } from '../lib/api';
+import { api, apiUrl } from '../lib/api';
 import { Notice, Card, Badge } from './Primitives';
 
 /**
@@ -54,7 +54,10 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
 
   const confidenceMode = state.confidenceMode;
   const eotThresholdMs = useMemo(
-    () => (confidenceMode === 'patient' ? VAD_DEFAULTS.endOfTurnPatientMs : VAD_DEFAULTS.endOfTurnNormalMs),
+    () =>
+      confidenceMode === 'patient'
+        ? VAD_DEFAULTS.endOfTurnPatientMs
+        : VAD_DEFAULTS.endOfTurnNormalMs,
     [confidenceMode],
   );
 
@@ -67,12 +70,19 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
     async function init(): Promise<void> {
       try {
         const prov = await api.providers();
-        const sttOk = prov.providers.some((p) => p.kind === 'stt' && p.status === 'ok' && p.configured);
+        const sttOk = prov.providers.some(
+          (p) => p.kind === 'stt' && p.status === 'ok' && p.configured,
+        );
         if (!mounted) return;
         setState((s) => ({ ...s, canRecord: sttOk, status: sttOk ? 'idle' : 'offline_fallback' }));
       } catch (e) {
         if (!mounted) return;
-        setState((s) => ({ ...s, error: (e as Error).message, canRecord: false, status: 'offline_fallback' }));
+        setState((s) => ({
+          ...s,
+          error: (e as Error).message,
+          canRecord: false,
+          status: 'offline_fallback',
+        }));
       }
     }
 
@@ -354,161 +364,172 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
   // -------------------------------------------------------------------------
   // Full pipeline: STT → LLM streaming → TTS
   // -------------------------------------------------------------------------
-  const runConversationPipeline = useCallback(async (audioBlob: Blob, audioSeconds: number) => {
-    if (!state.canRecord) return;
+  const runConversationPipeline = useCallback(
+    async (audioBlob: Blob, audioSeconds: number) => {
+      if (!state.canRecord) return;
 
-    setState((s) => ({ ...s, status: 'processing' }));
+      setState((s) => ({ ...s, status: 'processing' }));
 
-    try {
-      // ---- STEP 1: STT ----
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
+      try {
+        // ---- STEP 1: STT ----
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.webm');
 
-      const sttResp = await fetch('/api/stt/process', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-        headers: { 'x-sc-client': 'web' },
-      });
+        const sttResp = await fetch(apiUrl('/stt/process'), {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+          headers: { 'x-sc-client': 'web' },
+        });
 
-      if (!sttResp.ok) {
-        const err = await sttResp.json().catch(() => ({}));
-        throw new Error(err.message ?? 'STT failed');
-      }
+        if (!sttResp.ok) {
+          const err = await sttResp.json().catch(() => ({}));
+          throw new Error(err.message ?? 'STT failed');
+        }
 
-      const sttResult = await sttResp.json();
-      const transcript = sttResult.text?.trim();
+        const sttResult = await sttResp.json();
+        const transcript = sttResult.text?.trim();
 
-      if (!transcript) {
-        setState((s) => ({ ...s, status: 'listening', error: 'No speech detected. Try speaking louder or closer to the mic.' }));
-        return;
-      }
+        if (!transcript) {
+          setState((s) => ({
+            ...s,
+            status: 'listening',
+            error: 'No speech detected. Try speaking louder or closer to the mic.',
+          }));
+          return;
+        }
 
-      // ---- STEP 2: LLM (streamed) ----
-      setState((s) => ({ ...s, status: 'ai_speaking' }));
+        // ---- STEP 2: LLM (streamed) ----
+        setState((s) => ({ ...s, status: 'ai_speaking' }));
 
-      const llmResp = await fetch('/api/llm/stream', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-sc-client': 'web',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          system: 'You are a warm, patient English speaking coach for Indian learners. Respond naturally, briefly (1-2 sentences), and never use grammar jargon. If asked, explain in the user\'s native language.',
-          prompt: transcript,
-          maxOutputTokens: 256,
-          temperature: 0.7,
-        }),
-      });
+        const llmResp = await fetch(apiUrl('/llm/stream'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-sc-client': 'web',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            system:
+              "You are a warm, patient English speaking coach for Indian learners. Respond naturally, briefly (1-2 sentences), and never use grammar jargon. If asked, explain in the user's native language.",
+            prompt: transcript,
+            maxOutputTokens: 256,
+            temperature: 0.7,
+          }),
+        });
 
-      if (!llmResp.ok) {
-        throw new Error('LLM stream failed');
-      }
+        if (!llmResp.ok) {
+          throw new Error('LLM stream failed');
+        }
 
-      let fullResponse = '';
-      const reader = llmResp.body?.getReader();
-      const decoder = new TextDecoder();
+        let fullResponse = '';
+        const reader = llmResp.body?.getReader();
+        const decoder = new TextDecoder();
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6));
-                if (data.text && !data.done) {
-                  fullResponse += data.text;
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(6));
+                  if (data.text && !data.done) {
+                    fullResponse += data.text;
+                  }
+                } catch {
+                  // Ignore parse errors
                 }
-              } catch {
-                // Ignore parse errors
               }
             }
           }
         }
-      }
 
-      if (!fullResponse.trim()) {
-        setState((s) => ({ ...s, status: 'listening', error: 'No response from coach.' }));
-        return;
-      }
+        if (!fullResponse.trim()) {
+          setState((s) => ({ ...s, status: 'listening', error: 'No response from coach.' }));
+          return;
+        }
 
-      // ---- STEP 3: TTS ----
-      const ttsResp = await fetch('/api/tts/speak', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-sc-client': 'web',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          text: fullResponse,
-          speed: 1.0,
-        }),
-      });
-
-      if (!ttsResp.ok) {
-        throw new Error('TTS failed');
-      }
-
-      const audioArrayBuffer = await ttsResp.arrayBuffer();
-      const ttsAudioBlob = new Blob([audioArrayBuffer], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(ttsAudioBlob);
-
-      if (audioRef.current) {
-        audioRef.current.pause();
-        URL.revokeObjectURL(audioRef.current.src);
-      }
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        // When AI finishes speaking, go back to listening
-        setState((s) => {
-          if (s.status === 'ai_speaking') {
-            return { ...s, status: 'listening' };
-          }
-          return s;
+        // ---- STEP 3: TTS ----
+        const ttsResp = await fetch(apiUrl('/tts/speak'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-sc-client': 'web',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            text: fullResponse,
+            speed: 1.0,
+          }),
         });
-      };
 
-      audio.onerror = () => {
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        setState((s) => ({ ...s, status: 'listening', error: 'Audio playback failed.' }));
-      };
+        if (!ttsResp.ok) {
+          throw new Error('TTS failed');
+        }
 
-      audio.play().catch(() => {
-        // Autoplay blocked - user will need to interact
-      });
+        const audioArrayBuffer = await ttsResp.arrayBuffer();
+        const ttsAudioBlob = new Blob([audioArrayBuffer], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(ttsAudioBlob);
 
-      // Update state with usage
-      setState((s) => ({
-        ...s,
-        status: 'ai_speaking',
-        userSpeechMs: (s.userSpeechMs ?? 0) + (sttResult.usage?.audio_seconds ?? 0) * 1000,
-        error: null,
-        confidenceMode: s.confidenceMode,
-        elapsedMs: s.elapsedMs,
-        pressMs: 0,
-      }));
+        if (audioRef.current) {
+          audioRef.current.pause();
+          URL.revokeObjectURL(audioRef.current.src);
+        }
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
 
-      onTranscript?.(transcript, audioSeconds ?? 0);
-    } catch (e) {
-      setState((s) => ({ ...s, status: 'listening', error: (e as Error).message }));
-    }
-  }, [state.canRecord]);
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          audioRef.current = null;
+          // When AI finishes speaking, go back to listening
+          setState((s) => {
+            if (s.status === 'ai_speaking') {
+              return { ...s, status: 'listening' };
+            }
+            return s;
+          });
+        };
+
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl);
+          audioRef.current = null;
+          setState((s) => ({ ...s, status: 'listening', error: 'Audio playback failed.' }));
+        };
+
+        audio.play().catch(() => {
+          // Autoplay blocked - user will need to interact
+        });
+
+        // Update state with usage
+        setState((s) => ({
+          ...s,
+          status: 'ai_speaking',
+          userSpeechMs: (s.userSpeechMs ?? 0) + (sttResult.usage?.audio_seconds ?? 0) * 1000,
+          error: null,
+          confidenceMode: s.confidenceMode,
+          elapsedMs: s.elapsedMs,
+          pressMs: 0,
+        }));
+
+        onTranscript?.(transcript, audioSeconds ?? 0);
+      } catch (e) {
+        setState((s) => ({ ...s, status: 'listening', error: (e as Error).message }));
+      }
+    },
+    [state.canRecord],
+  );
 
   // -------------------------------------------------------------------------
   // Confidence mode toggle
   // -------------------------------------------------------------------------
   const toggleConfidenceMode = useCallback(() => {
-    setState((s) => ({ ...s, confidenceMode: s.confidenceMode === 'patient' ? 'normal' : 'patient' }));
+    setState((s) => ({
+      ...s,
+      confidenceMode: s.confidenceMode === 'patient' ? 'normal' : 'patient',
+    }));
   }, []);
 
   // -------------------------------------------------------------------------
@@ -518,7 +539,7 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
     const base = {
       idle: 'Tap to speak',
       listening: 'Hold to speak',
-      user_speaking: 'You\'re speaking…',
+      user_speaking: "You're speaking…",
       processing: 'Processing…',
       ai_speaking: 'Coach is speaking…',
       offline_fallback: 'Practice mode is busy - try again later',
@@ -540,7 +561,10 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
     }
   }, [state.status, state.bargeArmed]);
 
-  const btnDisabled = state.status !== 'listening' && state.status !== 'user_speaking' && state.status !== 'ai_speaking';
+  const btnDisabled =
+    state.status !== 'listening' &&
+    state.status !== 'user_speaking' &&
+    state.status !== 'ai_speaking';
 
   return (
     <main className="min-h-dvh flex flex-col items-center justify-center px-4 py-8">
@@ -559,15 +583,20 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
           className="text-xs text-accent-400 underline-offset-2 hover:underline"
           aria-pressed={confidenceMode === 'patient'}
         >
-          {confidenceMode === 'patient' ? 'Switch to Normal mode (1.5s EOT)' : 'Switch to Patient mode (2.5s EOT)'}
+          {confidenceMode === 'patient'
+            ? 'Switch to Normal mode (1.5s EOT)'
+            : 'Switch to Patient mode (2.5s EOT)'}
         </button>
         {state.error && (
-          <div className="mt-2"><Notice tone="bad">{state.error}</Notice></div>
+          <div className="mt-2">
+            <Notice tone="bad">{state.error}</Notice>
+          </div>
         )}
         {state.status === 'offline_fallback' && (
           <div className="mt-2">
             <Notice tone="neutral">
-              No STT provider is configured on the server. This is the "Practice mode is busy" offline‑capable fallback.
+              No STT provider is configured on the server. This is the "Practice mode is busy"
+              offline‑capable fallback.
             </Notice>
           </div>
         )}
@@ -608,7 +637,9 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
           <p className="mt-3 text-sm text-accent-400">Coach is speaking… (tap to interrupt)</p>
         )}
         {state.status === 'ai_speaking' && state.bargeArmed && (
-          <p className="mt-3 text-sm text-amber-400">Tap again within 0.4s to interrupt and speak</p>
+          <p className="mt-3 text-sm text-amber-400">
+            Tap again within 0.4s to interrupt and speak
+          </p>
         )}
       </Card>
     </main>
@@ -617,7 +648,13 @@ export function ConversationScreen({ onTranscript }: ConversationScreenProps) {
 
 /** ConversationState type - mirrors what the component stores internally. */
 type ConversationState = {
-  status: 'idle' | 'listening' | 'user_speaking' | 'processing' | 'ai_speaking' | 'offline_fallback';
+  status:
+    | 'idle'
+    | 'listening'
+    | 'user_speaking'
+    | 'processing'
+    | 'ai_speaking'
+    | 'offline_fallback';
   confidenceMode: 'normal' | 'patient';
   elapsedMs: number;
   userSpeechMs: number;

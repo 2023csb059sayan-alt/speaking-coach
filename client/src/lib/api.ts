@@ -21,7 +21,23 @@ import type {
  * so a dead session cannot cause a refresh loop.
  */
 
-const API_ROOT = '/api';
+/**
+ * Root of the API.
+ *
+ * In development the Vite server proxies /api to the local API, so this is a
+ * relative path and the browser sees one origin. In production the client and
+ * API are on different sites (Cloudflare Pages and Render), so the build must
+ * be given VITE_API_BASE_URL, e.g. https://speaking-coach-api.onrender.com/api.
+ *
+ * A relative default is deliberate: it keeps same-origin deployments working
+ * with no configuration at all.
+ */
+const API_ROOT = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/+$/, '');
+
+/** Absolute URL for an API path, always beginning with a single slash. */
+export function apiUrl(path: string): string {
+  return `${API_ROOT}${path.startsWith('/') ? path : `/${path}`}`;
+}
 
 export class ApiError extends Error {
   readonly code: ErrorCode;
@@ -46,7 +62,7 @@ interface RequestOptions {
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const response = await fetch(`${API_ROOT}${path}`, {
+  const response = await fetch(apiUrl(path), {
     method: options.method ?? 'GET',
     credentials: 'include',
     signal: options.signal,
@@ -62,7 +78,9 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const payload: unknown = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const body = payload as { error?: { code?: ErrorCode; message?: string; fields?: Record<string, string> } } | null;
+    const body = payload as {
+      error?: { code?: ErrorCode; message?: string; fields?: Record<string, string> };
+    } | null;
     const code: ErrorCode = body?.error?.code ?? 'internal_error';
     const message = body?.error?.message ?? 'Something went wrong. Please try again.';
 
