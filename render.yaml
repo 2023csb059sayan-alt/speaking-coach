@@ -21,7 +21,17 @@ services:
 
     # The monorepo root, not server/. The root build compiles shared, then the
     # server, then the client, which is the order typecheck and tests expect.
-    buildCommand: npm ci && npm run build
+    #
+    # --include=dev is load-bearing, not decoration. NODE_ENV=production below is
+    # applied to the build step as well as the runtime, and npm answers that by
+    # adding "dev" to its omit list. typescript is a devDependency, so a plain
+    # `npm ci` installs no compiler; `tsc` then misses node_modules/.bin and
+    # resolves to whatever TypeScript the build image carries globally. That one
+    # has already dropped moduleResolution=node10 (set in tsconfig.base.json),
+    # so the build died with TS5108. Verified by running both variants under
+    # NODE_ENV=production: without the flag TypeScript is absent and the build
+    # fails; with it, 5.9.3 installs and the build passes.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run start
     healthCheckPath: /api/health/live
 

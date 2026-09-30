@@ -50,6 +50,34 @@ first impression than one extra field to fill in.
 
 ---
 
+## The build needs `--include=dev`, because `NODE_ENV=production` covers it too
+
+**2026-10-01**
+
+The blueprint sets `NODE_ENV=production`, and Render applies environment
+variables to the build step as well as to the runtime. npm reads that and adds
+`dev` to its omit list, so a plain `npm ci` installs no devDependencies —
+`typescript` among them.
+
+With no local `tsc`, the `tsc -p tsconfig.json` in `shared` resolves to whatever
+TypeScript the build image carries globally, and that one has already dropped
+`moduleResolution=node10` (set in `tsconfig.base.json`). The first deploy died
+accordingly:
+
+```
+tsconfig.json(3,3): error TS5108: Option 'moduleResolution=node10' has been removed.
+```
+
+`buildCommand` is therefore `npm ci --include=dev && npm run build`. Both
+variants were run in a clean clone under `NODE_ENV=production` rather than
+inferred from the error message: without the flag TypeScript is absent, the
+`tsc` shim is missing, and the build exits 1; with it, 5.9.3 installs and all
+three workspaces emit `dist/`. Nothing about the runtime changes — `npm start`
+runs compiled `server/dist` against production dependencies only, and the extra
+dev packages in `node_modules` cost disk, not memory.
+
+---
+
 ## Client API base is a build-time variable
 
 **2026-09-30**

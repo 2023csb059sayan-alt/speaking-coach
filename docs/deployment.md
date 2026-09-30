@@ -128,7 +128,7 @@ Order matters — create the database first, then Render, then Pages, then the W
 
 **Manual path (no blueprint):** connect the repo and set Build / Start / Health Check yourself:
 
-**Build Command**: `npm ci && npm run build`
+**Build Command**: `npm ci --include=dev && npm run build`
 
 **Start Command**: `npm run start`
 
@@ -138,6 +138,11 @@ Order matters — create the database first, then Render, then Pages, then the W
 
 **Notes**:
 
+- `--include=dev` in the Build Command is load-bearing: Render applies
+  `NODE_ENV=production` to the build too, npm then omits devDependencies, and
+  `typescript` is one of them. Without it `tsc` falls back to the build image's
+  global TypeScript, which has removed `moduleResolution=node10`, and the build
+  fails with `TS5108`.
 - Render Hobby spins down after 15 min inactivity
 - The Worker in `worker/` pings `/api/health/live` every 10 min (step 4)
 - Disk is ephemeral — do not enable `AUDIO_STORAGE_ENABLED`
@@ -152,8 +157,12 @@ Order matters — create the database first, then Render, then Pages, then the W
 **Build Command**:
 
 ```bash
-npm ci && npm run build
+npm ci --include=dev && npm run build
 ```
+
+The `--include=dev` mirrors the Render build and is harmless if the platform
+leaves `NODE_ENV` unset: it only guarantees `typescript` and `vite` are present,
+and the build needs both.
 
 **Build Output Directory**: `client/dist`
 
