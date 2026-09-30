@@ -18,6 +18,7 @@ export interface AccessClaims {
   userId: string;
   email: string;
   displayName: string;
+  nativeLanguage: string;
 }
 
 const ISSUER = 'speaking-coach';
@@ -31,6 +32,7 @@ export async function signAccessToken(claims: AccessClaims): Promise<string> {
   return new SignJWT({
     email: claims.email,
     name: claims.displayName,
+    nativeLanguage: claims.nativeLanguage,
   })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setSubject(claims.userId)
@@ -48,6 +50,7 @@ export async function verifyAccessToken(token: string): Promise<AccessClaims> {
       userId: payload.sub,
       email: typeof payload['email'] === 'string' ? payload['email'] : '',
       displayName: typeof payload['name'] === 'string' ? payload['name'] : '',
+      nativeLanguage: typeof payload['nativeLanguage'] === 'string' ? payload['nativeLanguage'] : 'en',
     };
   } catch (error) {
     const expired = error instanceof Error && /expired/i.test(error.message);

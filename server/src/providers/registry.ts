@@ -72,6 +72,19 @@ export function readyProviders(kind: ProviderKind): BaseProvider[] {
   return orderedProviders(kind).filter((provider) => provider.isConfigured());
 }
 
+/** Type-safe ordered providers for each kind. */
+export function orderedLlmProviders(): LLMProvider[] {
+  return orderedProviders('llm') as LLMProvider[];
+}
+
+export function orderedSttProviders(): SpeechToTextProvider[] {
+  return orderedProviders('stt') as SpeechToTextProvider[];
+}
+
+export function orderedTtsProviders(): TextToSpeechProvider[] {
+  return orderedProviders('tts') as TextToSpeechProvider[];
+}
+
 /** Capability flags for the whole product, used by the client to build its UI. */
 export function capabilitySnapshot(): Record<string, boolean> {
   const providers = allProviders();

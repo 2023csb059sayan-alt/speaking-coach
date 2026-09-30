@@ -3,6 +3,7 @@ import type { Account } from './lib/api';
 import { useSession } from './hooks/useSession';
 import { AuthCard } from './components/AuthCard';
 import { TransparencyPanel } from './components/TransparencyPanel';
+import { ConversationScreen } from './components/ConversationScreen';
 import { Badge, Card, Notice } from './components/Primitives';
 import { LANGUAGE_LABELS, type SupportedLanguage } from '@speaking-coach/shared';
 
@@ -14,7 +15,7 @@ import { LANGUAGE_LABELS, type SupportedLanguage } from '@speaking-coach/shared'
  * here is a placeholder pretending to be a feature: what you can tap, you can use.
  */
 
-type Tab = 'home' | 'transparency';
+type Tab = 'home' | 'transparency' | 'conversation';
 
 export function App() {
   const session = useSession();
@@ -65,6 +66,7 @@ export function App() {
           [
             ['home', 'Home'],
             ['transparency', 'Free tier & limits'],
+            ['conversation', 'Conversation'],
           ] as [Tab, string][]
         ).map(([value, label]) => (
           <button
@@ -82,7 +84,9 @@ export function App() {
       </nav>
 
       <main className="mx-auto max-w-3xl space-y-5 px-5 py-5">
-        {tab === 'home' ? <HomeScreen account={session.account} /> : <TransparencyPanel />}
+        {tab === 'home' ? <HomeScreen account={session.account} /> : ''}
+        {tab === 'transparency' ? <TransparencyPanel /> : ''}
+        {tab === 'conversation' && session.account ? <ConversationScreen /> : <Notice tone="neutral">Sign in to start a conversation.</Notice>}
 
         <footer className="pb-10 pt-4 text-center text-xs leading-relaxed text-slate-600">
           Your recordings are processed only while you practise and are deleted on request. Nothing here is sold, and

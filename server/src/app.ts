@@ -1,5 +1,6 @@
 import cookieParser from 'cookie-parser';
 import express, { type Express } from 'express';
+import multer from 'multer';
 import { env } from './env';
 import { requestId } from './middleware/requestId';
 import { requireClientHeader } from './middleware/auth';
@@ -8,6 +9,8 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { authRouter } from './routes/auth';
 import { healthRouter } from './routes/health';
 import { keysRouter } from './routes/keys';
+import { voiceRouter } from './routes/voice';
+import { sessionsRouter } from './routes/sessions';
 import { runScheduledProbes } from './services/probes';
 
 /**
@@ -30,6 +33,17 @@ export function createApp(): Express {
   app.use(corsAllowlist());
   app.use(express.json({ limit: '256kb' }));
   app.use(cookieParser());
+
+  // Multer for audio uploads (stored in memory, not disk - ephemeral)
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 25 * 1024 * 1024 }, // 25 MB max (Groq limit)
+    fileFilter: (_req, file, cb) => {
+      if (file.mimetype.startsWith('audio/')) cb(null, true);
+      else cb(new Error('Only audio files allowed'));
+    },
+  });
+
   // Cookie-authenticated writes must carry a header a cross-site page cannot set.
   app.use(requireClientHeader);
 
@@ -44,6 +58,8 @@ export function createApp(): Express {
   app.use('/api/health', healthRouter);
   app.use('/api/auth', authRouter);
   app.use('/api/keys', keysRouter);
+  app.use('/api', upload.single('audio'), voiceRouter);
+  app.use('/api/sessions', sessionsRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

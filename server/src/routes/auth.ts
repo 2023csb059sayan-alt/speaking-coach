@@ -31,7 +31,7 @@ import {
   setRefreshCookie,
 } from '../services/cookies';
 import { signAccessToken } from '../services/tokens';
-import { UserModel } from '../models';
+import { UserModel, UserProfileModel } from '../models';
 import { logger } from '../logging';
 
 /**
@@ -62,10 +62,12 @@ authRouter.post(
 
     const account = await registerUser(parsed.data);
     const session = await issueSession(account.userId, sessionContext(req));
+    const profile = await UserProfileModel.findOne({ userId: account.userId }).lean();
     const accessToken = await signAccessToken({
       userId: account.userId,
       email: account.email,
       displayName: account.displayName,
+      nativeLanguage: profile?.nativeLanguage ?? 'en',
     });
     setAccessCookie(res, accessToken);
     setRefreshCookie(res, session.refreshToken, session.expiresAt);
@@ -84,11 +86,14 @@ authRouter.post(
     const user = await UserModel.findById(userId).lean();
     if (!user) throw new AppError('unauthorized');
 
+    const profile = await UserProfileModel.findOne({ userId }).lean();
+
     const session = await issueSession(userId, sessionContext(req));
     const accessToken = await signAccessToken({
       userId,
       email: user.email,
       displayName: user.displayName,
+      nativeLanguage: profile?.nativeLanguage ?? 'en',
     });
     setAccessCookie(res, accessToken);
     setRefreshCookie(res, session.refreshToken, session.expiresAt);
@@ -108,10 +113,13 @@ authRouter.post(
     const user = await UserModel.findById(userId).lean();
     if (!user) throw new AppError('unauthorized');
 
+    const profile = await UserProfileModel.findOne({ userId }).lean();
+
     const accessToken = await signAccessToken({
       userId,
       email: user.email,
       displayName: user.displayName,
+      nativeLanguage: profile?.nativeLanguage ?? 'en',
     });
     setAccessCookie(res, accessToken);
     setRefreshCookie(res, session.refreshToken, session.expiresAt);
