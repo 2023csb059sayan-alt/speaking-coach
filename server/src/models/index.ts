@@ -6,3 +6,7 @@ export { ProviderUsageModel, type ProviderUsageDocument } from './ProviderUsage'
 export { ProviderCredentialModel, type ProviderCredentialDocument } from './ProviderCredential';
 export { PracticeSessionModel, type IPracticeSession } from './PracticeSession';
 export { TurnModel, type ITurn } from './PracticeSession';
+export { InterviewQuestionModel, type IInterviewQuestion, type InterviewCategory, type InterviewDifficulty } from './InterviewQuestion';
+export { InterviewDocumentModel, type IInterviewDocument } from './InterviewQuestion';
+export { InterviewAnswerModel, type IInterviewAnswer } from './InterviewQuestion';
+export type { IInterviewSessionMeta } from './InterviewQuestion';

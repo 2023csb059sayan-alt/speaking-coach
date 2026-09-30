@@ -138,6 +138,8 @@ export interface SessionSummary {
   generatedAt: Date;
 }
 
+import type { InterviewCategory } from './InterviewQuestion';
+
 export interface IPracticeSession extends Document {
   userId: mongoose.Types.ObjectId;
   /** Session type: 'conversation' | 'interview' | 'drill' */
@@ -158,8 +160,20 @@ export interface IPracticeSession extends Document {
   interviewMeta?: {
     role: string;
     domain: string;
-    interviewType: string;
+    interviewTypes: InterviewCategory[];
     questionBankVersion: string;
+    plannedQuestionCount: number;
+    askedQuestionCount: number;
+    currentQuestionIndex: number;
+    mode: 'practice' | 'exam';
+    timeLimitPerQuestionSec?: number;
+    jdRefId?: string;
+    resumeRefId?: string;
+    readinessScore: number | null;
+    readinessFormulaVersion: string;
+    isComplete: boolean;
+    startedAt: Date;
+    completedAt: Date | null;
   };
   /** Confidence mode used */
   confidenceMode: 'normal' | 'patient';

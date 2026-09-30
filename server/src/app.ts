@@ -11,6 +11,7 @@ import { healthRouter } from './routes/health';
 import { keysRouter } from './routes/keys';
 import { voiceRouter } from './routes/voice';
 import { sessionsRouter } from './routes/sessions';
+import { interviewRouter } from './routes/interview';
 import { runScheduledProbes } from './services/probes';
 
 /**
@@ -60,6 +61,7 @@ export function createApp(): Express {
   app.use('/api/keys', keysRouter);
   app.use('/api', upload.single('audio'), voiceRouter);
   app.use('/api/sessions', sessionsRouter);
+  app.use('/api/interview', interviewRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
