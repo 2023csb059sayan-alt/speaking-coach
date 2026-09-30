@@ -10,3 +10,8 @@ export { InterviewQuestionModel, type IInterviewQuestion, type InterviewCategory
 export { InterviewDocumentModel, type IInterviewDocument } from './InterviewQuestion';
 export { InterviewAnswerModel, type IInterviewAnswer } from './InterviewQuestion';
 export type { IInterviewSessionMeta } from './InterviewQuestion';
+export { VocabularyCardModel, type IVocabularyCard } from './DrillProgress';
+export { DrillSessionModel, type IDrillSession, type DrillType } from './DrillProgress';
+export { DailyPlanModel, type IDailyPlan } from './DrillProgress';
+export { StreakModel, type IStreak } from './DrillProgress';
+export { ProgressSnapshotModel, type IProgressSnapshot } from './DrillProgress';

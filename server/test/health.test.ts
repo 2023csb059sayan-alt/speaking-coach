@@ -72,7 +72,7 @@ describe('GET /api/health/budget', () => {
 
 describe('unknown routes', () => {
   it('answers 404 in the shared error shape', async () => {
-    const response = await request(app).get('/api/does-not-exist');
+    const response = await request(app).get('/does-not-exist');
     expect(response.status).toBe(404);
     expect(response.body.error.code).toBe('not_found');
     expect(response.body.error.requestId).toBeTruthy();
