@@ -65,4 +65,18 @@ export default tseslint.config(
       'no-console': 'warn',
     },
   },
+  {
+    // Standalone operator scripts run directly with `node scripts/*.js`. They are
+    // CommonJS on purpose (package.json has no "type": "module"), so require() is
+    // the correct import form here and they are not part of the server's TS build.
+    files: ['scripts/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+      sourceType: 'commonjs',
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      'no-console': 'off',
+    },
+  },
 );
